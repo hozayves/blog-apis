@@ -33,5 +33,15 @@ router.post("/", async (req, res) => {
     user: _.pick(user, ["name", "email", "_id"]),
   });
 });
+// Get a users
+router.get("/", async (req, res) => {
+  const user = await User.find().select("name email profile gender");
+  if (!user)
+    return res.status(400).json({ ok: false, message: "User does not exits" });
+  if (user.length === 0)
+    return res.status(200).json({ ok: true, message: "No user found yet." });
+
+  res.status(200).json({ ok: true, user });
+});
 
 module.exports = router;
