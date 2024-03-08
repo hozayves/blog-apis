@@ -4,16 +4,11 @@ const { BlogModel } = require("../models/blogModel");
 const updateBlog = async (req, res) => {
   try {
     const { id } = req.params;
-    const blog = await BlogModel.findByIdAndUpdate(id, req.body);
+    const blog = await BlogModel.findByIdAndUpdate(id, req.body, { new: true });
 
     if (!blog) return res.status(404).json({ message: "Blog not found!" });
-    const updateBlog = await BlogModel.findById(id, req.body).select({
-      title: 1,
-      story: 1,
-    });
-    res
-      .status(200)
-      .json({ status: true, message: "Updated successful", updateBlog });
+
+    res.status(200).json({ ok: true, message: "Updated", blog });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -25,7 +20,7 @@ const getBlog = async (req, res) => {
     const blog = await BlogModel.findById(id, req.body);
 
     if (!blog) {
-      return res.status(404).json({ status: false, message: "No blog found!" });
+      return res.status(404).json({ ok: false, message: "No blog found!" });
     }
     res.status(200).json(blog);
   } catch (error) {
@@ -40,7 +35,7 @@ const getAllBlog = async (req, res) => {
     if (!blogs) {
       return res
         .status(404)
-        .json({ status: false, message: "No blog found! Try again later" });
+        .json({ ok: false, message: "No blog found! Try again later" });
     }
     res.status(200).json(blogs);
   } catch (error) {
@@ -54,9 +49,9 @@ const deleteBlog = async (req, res) => {
     const blog = await BlogModel.findByIdAndDelete(id, req.body);
 
     if (!blog)
-      return res.status(404).json({ status: false, message: "No blog found!" });
+      return res.status(404).json({ ok: false, message: "No blog found!" });
 
-    res.status(200).json({ status: true, message: "Blog deleted" });
+    res.status(200).json({ ok: true, message: "Blog deleted" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -70,11 +65,9 @@ const createNewBlog = async (req, res) => {
     if (!blog) {
       return res
         .status(404)
-        .json({ status: false, message: "Blog does not create!" });
+        .json({ ok: false, message: "Blog does not create!" });
     }
-    res
-      .status(200)
-      .json({ status: true, message: "Created successfully", blog });
+    res.status(200).json({ ok: true, message: "Created successfully", blog });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
