@@ -43,5 +43,17 @@ router.get("/", async (req, res) => {
 
   res.status(200).json({ ok: true, user });
 });
+// Get a specific user
+router.get("/:id", async (req, res) => {
+  const user = await User.findById(req.params.id).select(
+    "name email gender profile"
+  );
+  if (!user)
+    return res
+      .status(400)
+      .json({ ok: false, message: "A user with the given ID was not found" });
+
+  res.status(200).json({ ok: true, user });
+});
 
 module.exports = router;
