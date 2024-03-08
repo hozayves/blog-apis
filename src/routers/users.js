@@ -93,4 +93,43 @@ router.put("/:id", async (req, res) => {
   }
 });
 
+// Update Profile image
+router.post("/profile/:id", upload.single("profile"), async (req, res) => {
+  if (!req.file)
+    // Check if a file does not exist
+    return res
+      .status(400)
+      .json({ ok: false, message: "Profile Image required." });
+  // Error handling
+  try {
+    let user = await User.findOne({ _id: req.params.id }).select("profile");
+    if (!user)
+      return res
+        .status(400)
+        .json({ ok: false, message: "A User with a given ID was not found." });
+
+    try {
+      // using the fs.promises API, which provide promise-based file operations
+      if (user.profile) {
+        // Check if user is already has profile image and then delete it in directory
+        const filePath = path.join(
+          __dirname,
+          "../../upload/image",
+          user.profile
+        );
+        await unlink(filePath);
+      }
+
+      user.profile = req.file.filename;
+      await user.save();
+
+      res.status(200).json({ ok: true, message: "Profile Updated." });
+    } catch (error) {
+      res.status(400).json({ ok: false, message: error });
+    }
+  } catch (error) {
+    res.status(500).json({ ok: false, message: "Internal Server Error." });
+  }
+});
+
 module.exports = router;
