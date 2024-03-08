@@ -1,9 +1,12 @@
+const Joi = require("joi");
+Joi.objectId = require("joi-objectid")(Joi);
 require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const app = express();
 const port = process.env.PORT;
-const blogRouter = require("./routers/blogRoutes");
+const blogs = require("./routers/blogRoutes");
+const users = require("./routers/users");
 
 // middleware for accept json request
 app.use(express.json());
@@ -11,7 +14,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 //blog API
-app.use("/api/blogs", blogRouter);
+app.use("/api/blogs", blogs);
+// User endpoints
+app.use("/api/users", users);
 
 mongoose
   .connect(process.env.MONGODB_CONNECT_STRING)
