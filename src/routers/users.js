@@ -131,5 +131,33 @@ router.post("/profile/:id", upload.single("profile"), async (req, res) => {
     res.status(500).json({ ok: false, message: "Internal Server Error." });
   }
 });
+// Remove a Profile
+router.delete("/profile/:id", async (req, res) => {
+  try {
+    let user = await User.findById(req.params.id).select("profile");
+    if (!user)
+      return res.status(400).json({ ok: false, message: "User not found" });
+
+    try {
+      if (user.profile) {
+        const filePath = path.join(
+          __dirname,
+          "../../upload/image",
+          user.profile
+        );
+        await unlink(filePath);
+      }
+
+      user.profile = null;
+      await user.save();
+      res.status(200).json({ ok: true, message: "Profile removed." });
+    } catch (error) {
+      res.status(400).json({ ok: false, message: error });
+      console.log(error);
+    }
+  } catch (error) {
+    res.status(500).json({ ok: false, message: "Internal Server Error" });
+  }
+});
 
 module.exports = router;
