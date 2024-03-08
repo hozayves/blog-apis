@@ -65,5 +65,32 @@ router.delete("/:id", async (req, res) => {
 
   res.status(200).json({ ok: true, message: `${user.name} Deleted!` });
 });
+// Update a user
+router.put("/:id", async (req, res) => {
+  const { error } = validateUser(req.body);
+  if (error)
+    return res
+      .status(400)
+      .json({ ok: false, message: error.details[0].message });
+
+  try {
+    let user = await User.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+    })
+      .select("name")
+      .exec();
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(req.body.password, salt);
+
+    if (!user)
+      return res
+        .status(404)
+        .json({ ok: false, message: "A user with the given ID was not found" });
+
+    res.status(200).json({ ok: true, message: `${user.name} has updated` });
+  } catch (error) {
+    res.status(500).json({ ok: false, message: "Internal Server Error." });
+  }
+});
 
 module.exports = router;
