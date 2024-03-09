@@ -8,6 +8,7 @@ const port = process.env.PORT;
 const blogs = require("./routers/blogRoutes");
 const users = require("./routers/users");
 const messages = require("./routers/messages");
+const comments = require("./routers/comments");
 
 // middleware for accept json request
 app.use(express.json());
@@ -20,6 +21,8 @@ app.use("/api/blogs", blogs);
 app.use("/api/users", users);
 // Message endpoints
 app.use("/api/messages", messages);
+// Comment endpoints
+app.use("/api/comments", comments);
 
 mongoose
   .connect(process.env.MONGODB_CONNECT_STRING)
