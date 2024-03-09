@@ -2,7 +2,7 @@ const Joi = require("joi");
 const mongoose = require("mongoose");
 const { User } = require("../models/user");
 
-const BlogSchema = mongoose.Schema(
+const blogSchema = new mongoose.Schema(
   {
     title: {
       type: String,
@@ -40,7 +40,7 @@ const BlogSchema = mongoose.Schema(
   }
 );
 
-const BlogModel = mongoose.model("Blog", BlogSchema);
+const BlogModel = mongoose.model("Blog", blogSchema);
 
 function validateBlog(blog) {
   const schema = Joi.object({
@@ -55,4 +55,5 @@ function validateBlog(blog) {
 module.exports = {
   BlogModel,
   validateBlog,
+  blogSchema,
 };
