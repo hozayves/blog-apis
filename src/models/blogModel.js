@@ -34,6 +34,11 @@ const blogSchema = new mongoose.Schema(
       type: [mongoose.Schema.Types.ObjectId],
       ref: "User",
     },
+    blogger: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
   },
   {
     timestamps: true,
@@ -47,7 +52,7 @@ function validateBlog(blog) {
     title: Joi.string().required().max(255),
     story: Joi.string().required().max(10240),
     tags: Joi.string().required().max(20),
-    image: Joi.required(),
+    // image: Joi.string().optional(),
   });
   return schema.validate(blog);
 }
