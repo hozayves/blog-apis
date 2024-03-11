@@ -9,6 +9,15 @@ const blogs = require("./routers/blogRoutes");
 const users = require("./routers/users");
 const messages = require("./routers/messages");
 const comments = require("./routers/comments");
+const auths = require("./routers/auths");
+const errorHandler = require("./middleware/errorHandling");
+const config = require("config");
+
+// Check if jwtPrivateKey defined
+if (!config.get("jwtPrivateKey")) {
+  console.error("FATAL ERROR: jwtPrivateKey is not defined");
+  process.exit(1);
+}
 
 // middleware for accept json request
 app.use(express.json());
@@ -23,6 +32,10 @@ app.use("/api/users", users);
 app.use("/api/messages", messages);
 // Comment endpoints
 app.use("/api/comments", comments);
+// Authentication endpoint
+app.use("/api/auths", auths);
+
+app.use(errorHandler);
 
 mongoose
   .connect(process.env.MONGODB_CONNECT_STRING)
