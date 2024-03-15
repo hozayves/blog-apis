@@ -1,7 +1,7 @@
 require("dotenv").config();
 const bcrypt = require("bcryptjs");
 const Joi = require("joi");
-const asyncHandler = require("express-async-handler");
+const asyncHandler = require("express-async-errors");
 const { User } = require("../models/user");
 
 const authentication = asyncHandler(async (req, res) => {
