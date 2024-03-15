@@ -29,7 +29,8 @@ const userSchema = new mongoose.Schema({
   gender: {
     type: String,
     enum: ["male", "female"],
-    required: true,
+    // required: true,
+    default: null,
   },
   admin: {
     type: Boolean,
@@ -43,7 +44,7 @@ const userSchema = new mongoose.Schema({
 });
 userSchema.methods.generateAuthToken = function () {
   const token = jwt.sign(
-    { _id: this.id, admin: this.admin, email: this.email },
+    { _id: this.id, admin: this.admin },
     config.get("jwtPrivateKey"),
     { algorithm: "HS256" }
   );
@@ -56,7 +57,7 @@ function validateUser(user) {
   const schema = Joi.object({
     name: Joi.string().required().max(50),
     email: Joi.string().required().email(),
-    gender: Joi.string().required(),
+    // gender: Joi.string().required(),
     password: Joi.string().required(),
   });
   return schema.validate(user);
