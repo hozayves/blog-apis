@@ -1,4 +1,4 @@
-const asyncHandler = require("express-async-handler");
+const asyncHandler = require("express-async-errors");
 const _ = require("lodash");
 const mongoose = require("mongoose");
 const { unlink } = require("fs").promises;
@@ -20,7 +20,7 @@ const createUser = asyncHandler(async (req, res) => {
       .status(400)
       .json({ ok: false, message: "User already registered." });
 
-  user = new User(_.pick(req.body, ["name", "email", "gender", "password"]));
+  user = new User(_.pick(req.body, ["name", "email", "password"]));
   const salt = await bcrypt.genSalt(10);
   user.password = await bcrypt.hash(req.body.password, salt);
 
@@ -34,7 +34,7 @@ const createUser = asyncHandler(async (req, res) => {
 });
 // Function to get all users
 const getUsers = asyncHandler(async (req, res) => {
-  const user = await User.find().select("name email profile gender");
+  const user = await User.find().select("name email profile");
   if (!user)
     return res.status(400).json({ ok: false, message: "User does not exits" });
   if (user.length === 0)
@@ -42,17 +42,24 @@ const getUsers = asyncHandler(async (req, res) => {
 
   res.status(200).json({ ok: true, user });
 });
-// Function a user based on auth
+// Function a user based on params
 const getUser = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.params.id).select(
-    "name email gender profile"
-  );
+  const user = await User.findById(req.params.id).select("name profile _id");
   if (!user)
     return res
       .status(400)
       .json({ ok: false, message: "A user with the given ID was not found" });
 
-  res.status(200).json({ ok: true, user });
+  // Extract creation time from ObjectId
+  const creationTime = user._id.getTimestamp();
+
+  // Add creation time to the user object
+  const userWithTime = {
+    ...user.toObject(),
+    creationTime,
+  };
+
+  res.status(200).json({ ok: true, userWithTime });
 });
 // Function to delete a user
 const deleteUser = asyncHandler(async (req, res) => {
@@ -93,7 +100,11 @@ const updateProfile = asyncHandler(async (req, res) => {
 
   try {
     if (user.profile) {
-      const filePath = path.join(__dirname, "../../upload/image", user.profile);
+      const filePath = path.join(
+        __dirname,
+        "../../../upload/image",
+        user.profile
+      );
       await unlink(filePath);
     }
     user.profile = req.file.filename;
@@ -112,7 +123,11 @@ const removeProfile = asyncHandler(async (req, res) => {
 
   try {
     if (user.profile) {
-      const filePath = path.join(__dirname, "../../upload/image", user.profile);
+      const filePath = path.join(
+        __dirname,
+        "../../../upload/image",
+        user.profile
+      );
       await unlink(filePath);
     }
 
@@ -126,9 +141,7 @@ const removeProfile = asyncHandler(async (req, res) => {
 });
 // Function to get my profile
 const me = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.auth._id).select(
-    "-__v -password -admin"
-  );
+  const user = await User.findById(req.auth._id).select("-__v -password");
   res.status(200).json({ ok: true, user });
 });
 
