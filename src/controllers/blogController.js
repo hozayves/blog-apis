@@ -51,7 +51,7 @@ const deleteBlog = asyncHandler(async (req, res) => {
   if (!blog)
     return res.status(400).json({ ok: false, message: "Blog does not exist!" });
   // Blog's file path
-  const filePath = path.join(__dirname, "../../upload/image", blog.image);
+  const filePath = path.join(__dirname, "../../../upload/image", blog.image);
   try {
     await unlink(filePath); // dropped out from dir
     await blog.deleteOne(); // drop in the mongodb
