@@ -1,3 +1,4 @@
+const cors = require("cors");
 const Joi = require("joi");
 Joi.objectId = require("joi-objectid")(Joi);
 require("dotenv").config();
@@ -23,6 +24,10 @@ if (!config.get("jwtPrivateKey")) {
 app.use(express.json());
 // middleware for accept form request
 app.use(express.urlencoded({ extended: true }));
+app.use(errorHandler);
+
+// use cors
+app.use(cors());
 
 //blog API
 app.use("/api/blogs", blogs);
@@ -34,8 +39,6 @@ app.use("/api/messages", messages);
 app.use("/api/comments", comments);
 // Authentication endpoint
 app.use("/api/auths", auths);
-
-app.use(errorHandler);
 
 mongoose
   .connect(process.env.MONGODB_CONNECT_STRING)
