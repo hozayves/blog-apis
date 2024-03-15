@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 const config = require("config");
 
 module.exports = function (req, res, next) {
-  const token = req.header("blog-auth-token");
+  const token = req.header("blog-auth-token") || req.query.access_token;
   if (!token)
     return res
       .status(401)
