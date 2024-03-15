@@ -24,7 +24,6 @@ if (!config.get("jwtPrivateKey")) {
 app.use(express.json());
 // middleware for accept form request
 app.use(express.urlencoded({ extended: true }));
-app.use(errorHandler);
 
 // use cors
 app.use(cors());
@@ -51,3 +50,5 @@ mongoose
   .catch((error) => {
     console.log("Error found in mongodb connection", error);
   });
+
+app.use(errorHandler);
