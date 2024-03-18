@@ -39,9 +39,6 @@ const Comment = mongoose.model(
 function validateComment(comment) {
   const schema = Joi.object({
     comment: Joi.string().required(),
-    userId: Joi.objectId().required(),
-    blogId: Joi.objectId().required(),
-    replies: Joi.array().items(Joi.object),
   });
   return schema.validate(comment);
 }

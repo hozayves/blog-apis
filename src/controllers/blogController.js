@@ -1,11 +1,10 @@
 const { unlink } = require("fs").promises;
 const path = require("path");
-const asyncHandler = require("express-async-handler");
 const { BlogModel, validateBlog } = require("../models/blogModel");
 const _ = require("lodash");
 
 // Update a blog
-const updateBlog = asyncHandler(async (req, res) => {
+const updateBlog = async (req, res) => {
   let blog = await BlogModel.findOne({
     blogger: req.auth._id,
     _id: req.params.id,
@@ -22,17 +21,17 @@ const updateBlog = asyncHandler(async (req, res) => {
   );
 
   res.status(200).json({ ok: true, blog });
-});
+};
 // Function to get a blog based on Id
-const getBlog = asyncHandler(async (req, res) => {
+const getBlog = async (req, res) => {
   const blog = await BlogModel.findById(req.params.id);
   if (!blog)
     return res.status(404).json({ ok: false, message: "No blog found!" });
 
   res.status(200).json({ ok: true, blog });
-});
+};
 // Function to get all blog
-const getAllBlog = asyncHandler(async (req, res) => {
+const getAllBlog = async (req, res) => {
   const blogs = await BlogModel.find();
 
   if (!blogs) {
@@ -41,9 +40,9 @@ const getAllBlog = asyncHandler(async (req, res) => {
       .json({ ok: false, message: "No blog found! Try again later" });
   }
   res.status(200).json({ ok: true, blogs });
-});
+};
 // Function to delete a blog/story
-const deleteBlog = asyncHandler(async (req, res) => {
+const deleteBlog = async (req, res) => {
   const blog = await BlogModel.findOne({
     _id: req.params.id,
     blogger: req.auth._id,
@@ -59,10 +58,10 @@ const deleteBlog = asyncHandler(async (req, res) => {
   } catch (error) {
     res.status(400).json({ ok: false, message: error });
   }
-});
+};
 
 // Function to create a new blog/story
-const createNewBlog = asyncHandler(async (req, res) => {
+const createNewBlog = async (req, res) => {
   const { error } = validateBlog(req.body); // Validate with Joi endpoint req data us
   if (error)
     return res
@@ -83,7 +82,7 @@ const createNewBlog = asyncHandler(async (req, res) => {
       .status(404)
       .json({ ok: false, message: "Blog does not created!" });
   res.status(200).json({ ok: true, blog });
-});
+};
 
 module.exports = {
   createNewBlog,

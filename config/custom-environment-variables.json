@@ -1,3 +1,4 @@
 {
-    "jwtPrivateKey": "BLOG_JWTPRIVATEKEY"
+    "jwtPrivateKey": "BLOG_JWTPRIVATEKEY",
+    "mongodb": "MONGODB_CONNECTION"
 }
