@@ -44,7 +44,7 @@ app.use("/api/auths", auths);
 app.use("/api/likes", likeRoutes);
 
 mongoose
-  .connect(config.get("mongodb"))
+  .connect(process.env.MONGODB_CONNECTION)
   .then(() => {
     console.log("MongoDB connected successful");
     app.listen(port, () => {
