@@ -1,3 +1,4 @@
+const cloudinary = require("../utils/cloudinary");
 const _ = require("lodash");
 const mongoose = require("mongoose");
 const { unlink } = require("fs").promises;
@@ -98,44 +99,69 @@ const updateProfile = async (req, res) => {
     return res.status(400).json({ ok: false, message: "No user found" });
 
   try {
+    // Check if user.profile has a value (i.e if the user already has a profile image)
     if (user.profile) {
-      const filePath = path.join(
-        __dirname,
-        "../../../upload/image",
-        user.profile
-      );
-      await unlink(filePath);
-    }
-    user.profile = req.file.filename;
-    await user.save();
+      // Extract the public ID from the existing profile image URL
+      const publicId = user.profile.split("/").pop().split(".")[0];
 
-    res.status(200).json({ ok: true, message: "Profile Updated." });
+      // Delete the profile image from cloudinary
+      cloudinary.uploader.destroy(publicId, (error, result) => {
+        if (error) {
+          console.log(error);
+          return res
+            .status(500)
+            .json({ ok: false, message: "Error deleting profile image" });
+        }
+        console.log("Image deleted");
+      });
+    }
+    // Upload new profile image in Cloudinary
+    cloudinary.uploader.upload(req.file.path, async (error, result) => {
+      if (error)
+        return res.status(500).json({ success: false, message: "Error" });
+
+      user.profile = result.url;
+      await user.save();
+      res.status(200).json({ ok: true, message: "Profile Updated." });
+    });
   } catch (error) {
+    console.log(error);
     res.status(400).json({ ok: false, message: error });
   }
 };
 // Function to remove a user profile
 const removeProfile = async (req, res) => {
-  let user = await User.findOne({ _id: req.auth._id }).select("profile");
-  if (!user)
-    return res.status(400).json({ ok: false, message: "User not found" });
-
   try {
-    if (user.profile) {
-      const filePath = path.join(
-        __dirname,
-        "../../../upload/image",
-        user.profile
-      );
-      await unlink(filePath);
-    }
+    let user = await User.findOne({ _id: req.auth._id }).select("profile");
+    if (!user)
+      return res.status(400).json({ ok: false, message: "User not found" });
 
-    user.profile = null;
-    await user.save();
-    res.status(200).json({ ok: true, message: "Profile removed." });
+    try {
+      // Check if user.profile has a value
+      if (user.profile) {
+        // Extract public ID from the existing profile image url
+        const publicId = user.profile.split("/").pop().split(".")[0];
+
+        // Delete the profile image from Cloudinary
+        cloudinary.uploader.destroy(publicId, async (error, result) => {
+          if (error) {
+            console.log(error);
+            res
+              .status(400)
+              .json({ ok: false, message: "Error deleting profile image" });
+          }
+          user.profile = null;
+          await user.save();
+          res.status(200).json({ ok: true, message: "Profile removed." });
+        });
+      }
+    } catch (error) {
+      res.status(400).json({ ok: false, message: error });
+      console.log(error);
+    }
   } catch (error) {
-    res.status(400).json({ ok: false, message: error });
     console.log(error);
+    res.status(500).json({ ok: false, message: "Internal Server Error" });
   }
 };
 // Function to get my profile
