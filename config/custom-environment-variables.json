@@ -1,3 +1,8 @@
 {
-    "jwtPrivateKey": "BLOG_JWTPRIVATEKEY"
+    "jwtPrivateKey": "BLOG_JWTPRIVATEKEY",
+    "mongodb": "MONGODB_CONNECTION",
+    "node_env": "NODE_ENV",
+    "cloud_name": "CLOUDINARY_NAME",
+    "api_key": "CLOUDINARY_KEY",
+    "api_secret": "CLOUDINARY_SECRET"
 }

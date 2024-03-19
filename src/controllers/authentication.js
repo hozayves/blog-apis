@@ -1,10 +1,9 @@
 require("dotenv").config();
 const bcrypt = require("bcryptjs");
 const Joi = require("joi");
-const asyncHandler = require("express-async-handler");
 const { User } = require("../models/user");
 
-const authentication = asyncHandler(async (req, res) => {
+const authentication = async (req, res) => {
   const { error } = validateAuth(req.body);
   if (error)
     return res
@@ -26,7 +25,7 @@ const authentication = asyncHandler(async (req, res) => {
   const token = user.generateAuthToken();
 
   res.header("blog-auth-token", token).status(200).json({ ok: true, token });
-});
+};
 
 module.exports = authentication;
 

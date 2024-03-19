@@ -1,3 +1,5 @@
+require("express-async-errors");
+const cors = require("cors");
 const Joi = require("joi");
 Joi.objectId = require("joi-objectid")(Joi);
 require("dotenv").config();
@@ -10,6 +12,7 @@ const users = require("./routers/users");
 const messages = require("./routers/messages");
 const comments = require("./routers/comments");
 const auths = require("./routers/auths");
+const likeRoutes = require("./routers/likeRoutes");
 const errorHandler = require("./middleware/errorHandling");
 const config = require("config");
 
@@ -24,6 +27,9 @@ app.use(express.json());
 // middleware for accept form request
 app.use(express.urlencoded({ extended: true }));
 
+// use cors
+app.use(cors());
+
 //blog API
 app.use("/api/blogs", blogs);
 // User endpoints
@@ -34,11 +40,11 @@ app.use("/api/messages", messages);
 app.use("/api/comments", comments);
 // Authentication endpoint
 app.use("/api/auths", auths);
-
-app.use(errorHandler);
+// Likes endpoint
+app.use("/api/likes", likeRoutes);
 
 mongoose
-  .connect(process.env.MONGODB_CONNECT_STRING)
+  .connect(config.get("mongodb"))
   .then(() => {
     console.log("MongoDB connected successful");
     app.listen(port, () => {
@@ -48,3 +54,5 @@ mongoose
   .catch((error) => {
     console.log("Error found in mongodb connection", error);
   });
+
+app.use(errorHandler);
