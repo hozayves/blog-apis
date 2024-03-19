@@ -1,4 +1,4 @@
-const asyncHandler = require("express-async-errors");
+const cloudinary = require("../utils/cloudinary");
 const _ = require("lodash");
 const mongoose = require("mongoose");
 const { unlink } = require("fs").promises;
@@ -7,7 +7,7 @@ const { validateUser, User } = require("../models/user");
 const bcrypt = require("bcryptjs");
 
 // Function to create a user
-const createUser = asyncHandler(async (req, res) => {
+const createUser = async (req, res) => {
   const { error } = validateUser(req.body);
   if (error)
     return res
@@ -31,9 +31,9 @@ const createUser = asyncHandler(async (req, res) => {
     message: `${user.name} created successful.`,
     user: _.pick(user, ["name", "email", "_id"]),
   });
-});
+};
 // Function to get all users
-const getUsers = asyncHandler(async (req, res) => {
+const getUsers = async (req, res) => {
   const user = await User.find().select("name email profile");
   if (!user)
     return res.status(400).json({ ok: false, message: "User does not exits" });
@@ -41,9 +41,9 @@ const getUsers = asyncHandler(async (req, res) => {
     return res.status(200).json({ ok: true, message: "No user found yet." });
 
   res.status(200).json({ ok: true, user });
-});
+};
 // Function a user based on params
-const getUser = asyncHandler(async (req, res) => {
+const getUser = async (req, res) => {
   const user = await User.findById(req.params.id).select("name profile _id");
   if (!user)
     return res
@@ -60,9 +60,9 @@ const getUser = asyncHandler(async (req, res) => {
   };
 
   res.status(200).json({ ok: true, userWithTime });
-});
+};
 // Function to delete a user
-const deleteUser = asyncHandler(async (req, res) => {
+const deleteUser = async (req, res) => {
   const user = await User.findOneAndDelete({ _id: req.params.id });
   if (!user)
     return res
@@ -70,9 +70,9 @@ const deleteUser = asyncHandler(async (req, res) => {
       .json({ ok: false, message: "A user with the given ID was not found" });
 
   res.status(200).json({ ok: true, message: `${user.name} Deleted!` });
-});
+};
 // Function to update a user profile information
-const updateUser = asyncHandler(async (req, res) => {
+const updateUser = async (req, res) => {
   let user = await User.findOne({ _id: req.auth._id });
 
   if (req.body.password) {
@@ -86,9 +86,9 @@ const updateUser = asyncHandler(async (req, res) => {
   }).select("-admin -region -password -__v");
 
   res.status(200).json({ ok: true, message: user });
-});
+};
 // Function to update a user profile image
-const updateProfile = asyncHandler(async (req, res) => {
+const updateProfile = async (req, res) => {
   if (!req.file)
     return res
       .status(400)
@@ -99,51 +99,76 @@ const updateProfile = asyncHandler(async (req, res) => {
     return res.status(400).json({ ok: false, message: "No user found" });
 
   try {
+    // Check if user.profile has a value (i.e if the user already has a profile image)
     if (user.profile) {
-      const filePath = path.join(
-        __dirname,
-        "../../../upload/image",
-        user.profile
-      );
-      await unlink(filePath);
+      // Extract the public ID from the existing profile image URL
+      const publicId = user.profile.split("/").pop().split(".")[0];
+
+      // Delete the profile image from cloudinary
+      cloudinary.uploader.destroy(publicId, (error, result) => {
+        if (error) {
+          console.log(error);
+          return res
+            .status(500)
+            .json({ ok: false, message: "Error deleting profile image" });
+        }
+        console.log("Image deleted");
+      });
     }
-    user.profile = req.file.filename;
-    await user.save();
+    // Upload new profile image in Cloudinary
+    cloudinary.uploader.upload(req.file.path, async (error, result) => {
+      if (error)
+        return res.status(500).json({ success: false, message: "Error" });
 
-    res.status(200).json({ ok: true, message: "Profile Updated." });
+      user.profile = result.url;
+      await user.save();
+      res.status(200).json({ ok: true, message: "Profile Updated." });
+    });
   } catch (error) {
-    res.status(400).json({ ok: false, message: error });
-  }
-});
-// Function to remove a user profile
-const removeProfile = asyncHandler(async (req, res) => {
-  let user = await User.findOne({ _id: req.auth._id }).select("profile");
-  if (!user)
-    return res.status(400).json({ ok: false, message: "User not found" });
-
-  try {
-    if (user.profile) {
-      const filePath = path.join(
-        __dirname,
-        "../../../upload/image",
-        user.profile
-      );
-      await unlink(filePath);
-    }
-
-    user.profile = null;
-    await user.save();
-    res.status(200).json({ ok: true, message: "Profile removed." });
-  } catch (error) {
-    res.status(400).json({ ok: false, message: error });
     console.log(error);
+    res.status(400).json({ ok: false, message: error });
   }
-});
+};
+// Function to remove a user profile
+const removeProfile = async (req, res) => {
+  try {
+    let user = await User.findOne({ _id: req.auth._id }).select("profile");
+    if (!user)
+      return res.status(400).json({ ok: false, message: "User not found" });
+
+    try {
+      // Check if user.profile has a value
+      if (user.profile) {
+        // Extract public ID from the existing profile image url
+        const publicId = user.profile.split("/").pop().split(".")[0];
+
+        // Delete the profile image from Cloudinary
+        cloudinary.uploader.destroy(publicId, async (error, result) => {
+          if (error) {
+            console.log(error);
+            res
+              .status(400)
+              .json({ ok: false, message: "Error deleting profile image" });
+          }
+          user.profile = null;
+          await user.save();
+          res.status(200).json({ ok: true, message: "Profile removed." });
+        });
+      }
+    } catch (error) {
+      res.status(400).json({ ok: false, message: error });
+      console.log(error);
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ ok: false, message: "Internal Server Error" });
+  }
+};
 // Function to get my profile
-const me = asyncHandler(async (req, res) => {
+const me = async (req, res) => {
   const user = await User.findById(req.auth._id).select("-__v -password");
   res.status(200).json({ ok: true, user });
-});
+};
 
 module.exports = {
   createUser,

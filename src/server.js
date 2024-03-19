@@ -1,3 +1,4 @@
+require("express-async-errors");
 const cors = require("cors");
 const Joi = require("joi");
 Joi.objectId = require("joi-objectid")(Joi);
@@ -11,6 +12,7 @@ const users = require("./routers/users");
 const messages = require("./routers/messages");
 const comments = require("./routers/comments");
 const auths = require("./routers/auths");
+const likeRoutes = require("./routers/likeRoutes");
 const errorHandler = require("./middleware/errorHandling");
 const config = require("config");
 
@@ -38,11 +40,14 @@ app.use("/api/messages", messages);
 app.use("/api/comments", comments);
 // Authentication endpoint
 app.use("/api/auths", auths);
+// Likes endpoint
+app.use("/api/likes", likeRoutes);
 
 mongoose
   .connect(
     "mongodb+srv://hozayves:sr3g1Lc2ct9T2om4@blogbackend.arlutag.mongodb.net/blogDatabase?retryWrites=true&w=majority&appName=blogBackendx"
   )
+
   .then(() => {
     console.log("MongoDB connected successful");
     app.listen(port, () => {
