@@ -40,7 +40,9 @@ app.use("/api/comments", comments);
 app.use("/api/auths", auths);
 
 mongoose
-  .connect(process.env.MONGODB_CONNECT_STRING)
+  .connect(
+    "mongodb+srv://hozayves:sr3g1Lc2ct9T2om4@blogbackend.arlutag.mongodb.net/blogDatabase?retryWrites=true&w=majority&appName=blogBackendx"
+  )
   .then(() => {
     console.log("MongoDB connected successful");
     app.listen(port, () => {
