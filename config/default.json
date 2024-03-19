@@ -1,6 +1,7 @@
 {
     "jwtPrivateKey": "",
-    "mongodb": ""
+    "mongodb": "",
+    "node_env": ""
 
     
 }
