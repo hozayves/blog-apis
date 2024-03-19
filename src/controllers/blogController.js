@@ -1,4 +1,4 @@
-const { unlink } = require("fs").promises;
+const cloudinary = require("../utils/cloudinary");
 const path = require("path");
 const { BlogModel, validateBlog } = require("../models/blogModel");
 const _ = require("lodash");
@@ -50,14 +50,17 @@ const deleteBlog = async (req, res) => {
   if (!blog)
     return res.status(400).json({ ok: false, message: "Blog does not exist!" });
   // Blog's file path
-  const filePath = path.join(__dirname, "../../../upload/image", blog.image);
-  try {
-    await unlink(filePath); // dropped out from dir
+  const publicId = blog.image.split("/").pop().split(".")[0];
+  cloudinary.uploader.destroy(publicId, async (error, result) => {
+    if (error) {
+      console.log(error);
+      res
+        .status(400)
+        .json({ ok: false, message: "Error deleting profile image" });
+    }
     await blog.deleteOne(); // drop in the mongodb
     res.status(200).json({ ok: true, message: "Blog deleted." });
-  } catch (error) {
-    res.status(400).json({ ok: false, message: error });
-  }
+  });
 };
 
 // Function to create a new blog/story
@@ -68,20 +71,28 @@ const createNewBlog = async (req, res) => {
       .status(400)
       .json({ ok: false, message: error.details[0].message });
 
-  let blog = new BlogModel({
-    title: req.body.title,
-    story: req.body.story,
-    tags: req.body.tags.split(" "),
-    image: req.file.filename,
-    blogger: req.auth._id,
-  });
-  await blog.save();
+  cloudinary.uploader.upload(req.file.path, async (error, result) => {
+    if (error) {
+      console.log(error);
+      res
+        .status(400)
+        .json({ ok: false, message: "Error uploading profile image" });
+    }
+    let blog = new BlogModel({
+      title: req.body.title,
+      story: req.body.story,
+      tags: req.body.tags.split(" "),
+      image: result.url,
+      blogger: req.auth._id,
+    });
+    await blog.save();
 
-  if (!blog)
-    return res
-      .status(404)
-      .json({ ok: false, message: "Blog does not created!" });
-  res.status(200).json({ ok: true, blog });
+    if (!blog)
+      return res
+        .status(404)
+        .json({ ok: false, message: "Blog does not created!" });
+    res.status(200).json({ ok: true, blog });
+  });
 };
 
 module.exports = {
