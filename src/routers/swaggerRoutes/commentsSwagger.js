@@ -1,5 +1,6 @@
 const sendComment = {
   tags: ["Comments"],
+  security: [{ bearerAuth: [] }],
   description: "Send a comment",
   requestBody: {
     content: {
@@ -45,6 +46,7 @@ const sendComment = {
 const deleteComment = {
   tags: ["Comments"],
   description: "Delete a comment",
+  security: [{ bearerAuth: [] }],
   parameters: [{ id: "65ec47c2449d686516b34477" }],
   responses: {
     200: {
@@ -66,6 +68,7 @@ const deleteComment = {
 const editComment = {
   tags: ["Comments"],
   description: "Edit a comment",
+  security: [{ bearerAuth: [] }],
   parameters: [{ id: "65ec47c2449d686516b34477" }],
   responses: {
     200: {
@@ -86,6 +89,7 @@ const editComment = {
 };
 const getCommentsByBlogId = {
   tags: ["Comments"],
+  security: [{ bearerAuth: [] }],
   description: "Get comments by blogId",
   parameters: [{ blogId: "65f47074618b2cbeb9edaecd" }],
   responses: {

@@ -43,10 +43,12 @@ const postUser = {
       },
     },
   },
+  // security: [{ bearerAuth: [] }],
 };
 const getUsers = {
   tags: ["Users"],
   description: "GET ALL USERS",
+  security: [{ bearerAuth: [] }],
   responses: {
     200: {
       description: "Users retrieved",
@@ -80,6 +82,7 @@ const getUsers = {
 const getUser = {
   tags: ["Users"],
   description: "GET USER BY ID",
+  security: [{ bearerAuth: [] }],
   parameters: [
     {
       _id: "65fc8baa15e6768fa85906a9",
@@ -110,6 +113,7 @@ const getUser = {
 const deleteUser = {
   tags: ["Users"],
   description: "DELETE USER BY ID",
+  security: [{ bearerAuth: [] }],
   parameters: [
     {
       _id: "65fc8baa15e6768fa85906a9",
@@ -135,6 +139,7 @@ const deleteUser = {
 const putUser = {
   tags: ["Users"],
   description: "PUT USER BY ID",
+  security: [{ bearerAuth: [] }],
   responses: {
     200: {
       description: "User updated",
@@ -161,6 +166,7 @@ const putUser = {
 const changeProfile = {
   tags: ["Users"],
   description: "CHANGE USER PROFILE",
+  security: [{ bearerAuth: [] }],
   responses: {
     200: {
       description: "User updated",

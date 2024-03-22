@@ -1,6 +1,7 @@
 const createBlog = {
   description: "Create a new blog",
   tags: ["Blogs"],
+  security: [{ bearerAuth: [] }],
   requestBody: {
     content: {
       "application/json": {
@@ -155,6 +156,7 @@ const getBlog = {
 const updateBlog = {
   tags: ["Blogs"],
   description: "Update a blog",
+  security: [{ bearerAuth: [] }],
   parameters: [{ id: "65f47074618b2cbeb9edaecd" }],
   requestBody: {
     content: {
@@ -211,6 +213,7 @@ const updateBlog = {
 const deleteBlog = {
   tags: ["Blogs"],
   description: "Delete a blog",
+  security: [{ bearerAuth: [] }],
   parameters: [{ id: "65f47074618b2cbeb9edaecd" }],
   responses: {
     200: {

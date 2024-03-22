@@ -1,6 +1,7 @@
 const sendLikeUnlike = {
   tags: ["Likes"],
   description: "Like or Unlike a blog",
+  security: [{ bearerAuth: [] }],
   parameters: [{ blogId: "65f47074618b2cbeb9edaecd" }],
   responses: {
     200: {
@@ -33,6 +34,7 @@ const sendLikeUnlike = {
 const getLikes = {
   tags: ["Likes"],
   description: "Get likes",
+  security: [{ bearerAuth: [] }],
   parameters: [{ blogId: "65f47074618b2cbeb9edaecd" }],
   responses: {
     200: {
