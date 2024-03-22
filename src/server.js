@@ -1,3 +1,5 @@
+const swaggerDoc = require("swagger-ui-express");
+const swaggerDocumentation = require("./helper/documentation");
 require("express-async-errors");
 const cors = require("cors");
 const Joi = require("joi");
@@ -17,15 +19,18 @@ const errorHandler = require("./middleware/errorHandling");
 const config = require("config");
 
 // Check if jwtPrivateKey defined
-if (!config.get("jwtPrivateKey")) {
-  console.error("FATAL ERROR: jwtPrivateKey is not defined");
-  process.exit(1);
-}
+// if (!config.get("jwtPrivateKey")) {
+//   console.error("FATAL ERROR: jwtPrivateKey is not defined");
+//   process.exit(1);
+// }
 
 // middleware for accept json request
 app.use(express.json());
 // middleware for accept form request
 app.use(express.urlencoded({ extended: true }));
+// Swagger documentation route
+app.use("/documentations", swaggerDoc.serve);
+app.use("/documentations", swaggerDoc.setup(swaggerDocumentation));
 
 // use cors
 app.use(cors());
@@ -43,19 +48,17 @@ app.use("/api/auths", auths);
 // Likes endpoint
 app.use("/api/likes", likeRoutes);
 
-mongoose
-  .connect(
-    "mongodb+srv://hozayves:sr3g1Lc2ct9T2om4@blogbackend.arlutag.mongodb.net/blogDatabase?retryWrites=true&w=majority&appName=blogBackendx"
-  )
+try {
+  mongoose.connect(config.get("db"));
+  console.log(`MongoDB connected ${config.get("db")}`);
+} catch (error) {
+  console.log(error);
+}
 
-  .then(() => {
-    console.log("MongoDB connected successful");
-    app.listen(port, () => {
-      console.log("Listening API on port :" + port);
-    });
-  })
-  .catch((error) => {
-    console.log("Error found in mongodb connection", error);
-  });
+const server = app.listen(port, () => {
+  console.log("Listening API on port :" + port);
+});
+
+module.exports = server;
 
 app.use(errorHandler);
