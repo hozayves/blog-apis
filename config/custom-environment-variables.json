@@ -1,6 +1,6 @@
 {
     "jwtPrivateKey": "BLOG_JWTPRIVATEKEY",
-    "mongodb": "MONGODB_CONNECTION",
+    "mongodb": "MONGODB_CONNECT_STRING",
     "node_env": "NODE_ENV",
     "cloud_name": "CLOUDINARY_NAME",
     "api_key": "CLOUDINARY_KEY",

@@ -4,7 +4,7 @@
     "node_env": "",
     "cloud_name": "",
     "api_key": "",
-    "api_secret": ""
-
+    "api_secret": "",
+    "db": "mongodb+srv://hozayves:sr3g1Lc2ct9T2om4@blogbackend.arlutag.mongodb.net/blogDatabase?retryWrites=true&w=majority&appName=blogBackendx"
     
 }
