@@ -34,13 +34,13 @@ const createUser = async (req, res) => {
 };
 // Function to get all users
 const getUsers = async (req, res) => {
-  const user = await User.find().select("name email profile");
-  if (!user)
+  const users = await User.find().select("name email profile").sort("-_id");
+  if (!users)
     return res.status(400).json({ ok: false, message: "User does not exits" });
-  if (user.length === 0)
+  if (users.length === 0)
     return res.status(200).json({ ok: true, message: "No user found yet." });
 
-  res.status(200).json({ ok: true, user });
+  res.status(200).json({ ok: true, users });
 };
 // Function a user based on params
 const getUser = async (req, res) => {
@@ -63,6 +63,9 @@ const getUser = async (req, res) => {
 };
 // Function to delete a user
 const deleteUser = async (req, res) => {
+  if (!mongoose.Types.ObjectId.isValid(req.params.id))
+    return res.status(400).json({ ok: false, message: "Invalid user id" });
+
   const user = await User.findOneAndDelete({ _id: req.params.id });
   if (!user)
     return res
@@ -74,6 +77,8 @@ const deleteUser = async (req, res) => {
 // Function to update a user profile information
 const updateUser = async (req, res) => {
   let user = await User.findOne({ _id: req.auth._id });
+  if (!user)
+    return res.status(404).json({ ok: false, message: "User no found" });
 
   if (req.body.password) {
     const salt = await bcrypt.genSalt(10);
@@ -166,8 +171,15 @@ const removeProfile = async (req, res) => {
 };
 // Function to get my profile
 const me = async (req, res) => {
-  const user = await User.findById(req.auth._id).select("-__v -password");
-  res.status(200).json({ ok: true, user });
+  try {
+    if (!new mongoose.Types.ObjectId.isValid(req.auth._id))
+      return res.status(404).json({ ok: false, message: "Invalid Id" });
+
+    const user = await User.findById(req.auth._id).select("-__v -password");
+    res.status(200).json({ ok: true, user });
+  } catch (error) {
+    res.status(500).json({ ok: false, message: "Internal Server Error" });
+  }
 };
 
 module.exports = {
