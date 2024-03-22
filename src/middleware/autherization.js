@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const config = require("config");
+// const config = require("config");
 
 module.exports = function (req, res, next) {
   const token = req.header("blog-auth-token") || req.query.access_token;
@@ -14,7 +14,7 @@ module.exports = function (req, res, next) {
   }
 
   try {
-    const decodePayload = jwt.verify(token, config.get("jwtPrivateKey"));
+    const decodePayload = jwt.verify(token, process.env.BLOG_JWTPRIVATEKEY);
     req.auth = decodePayload;
     req.isAuthenticated = true;
     next();
