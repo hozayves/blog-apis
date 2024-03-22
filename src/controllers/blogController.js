@@ -76,7 +76,7 @@ const createNewBlog = async (req, res) => {
       console.log(error);
       res
         .status(400)
-        .json({ ok: false, message: "Error uploading profile image" });
+        .json({ ok: false, message: "Error uploading blog image" });
     }
     let blog = new BlogModel({
       title: req.body.title,
