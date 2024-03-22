@@ -172,9 +172,6 @@ const removeProfile = async (req, res) => {
 // Function to get my profile
 const me = async (req, res) => {
   try {
-    if (!new mongoose.Types.ObjectId.isValid(req.auth._id))
-      return res.status(404).json({ ok: false, message: "Invalid Id" });
-
     const user = await User.findById(req.auth._id).select("-__v -password");
     res.status(200).json({ ok: true, user });
   } catch (error) {
