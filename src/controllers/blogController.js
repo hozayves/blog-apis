@@ -66,12 +66,10 @@ const deleteBlog = async (req, res) => {
 // Function to create a new blog/story
 const createNewBlog = async (req, res) => {
   const { error } = validateBlog(req.body); // Validate with Joi endpoint req data us
-  if (error) {
-    console.log(error);
+  if (error)
     return res
       .status(400)
       .json({ ok: false, message: error.details[0].message });
-  }
 
   cloudinary.uploader.upload(req.file.path, async (error, result) => {
     if (error) {
