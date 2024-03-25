@@ -3,8 +3,21 @@
   "version": "1.0.0",
   "description": "",
   "main": "server.js",
+  "jest": {
+      "verbose": true,
+      "collectCoverageFrom": [
+        "src/controllers/*.js",
+        "src/middleware/*.js",
+        "src/models/*.js",
+        "!src/middleware/imageStorage.js",
+        "!src/**/*.test.js",
+        "!src/**/*.spec.js",
+        "!src/**/*.mock.js",
+        "!src/**/*.config.js"
+      ]
+  },
   "scripts": {
-    "test": "jest --verbose --coverage",
+    "test": "jest --coverage",
     "dev": "nodemon ./src/server.js"
   },
   "keywords": [],
