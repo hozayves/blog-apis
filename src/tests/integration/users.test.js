@@ -15,11 +15,11 @@ describe("/api/users", () => {
     });
     await user.save();
     token = user.generateAuthToken();
-  });
+  }, 10000);
   afterEach(async () => {
     server.close();
     await User.deleteMany({});
-  });
+  }, 10000);
   // Create a user
   describe("POST /", () => {
     it("should return 200 if user sussefully created", async () => {
