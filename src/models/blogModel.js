@@ -58,7 +58,7 @@ const BlogModel = mongoose.model("Blog", blogSchema);
 function validateBlog(blog) {
   const schema = Joi.object({
     title: Joi.string().required().max(255),
-    story: Joi.string().required().max(10240),
+    story: Joi.string().required(),
     tags: Joi.string().required().max(20),
     // image: Joi.string().optional(),
   });
