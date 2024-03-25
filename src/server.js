@@ -47,10 +47,20 @@ app.use("/api/comments", comments);
 app.use("/api/auths", auths);
 // Likes endpoint
 app.use("/api/likes", likeRoutes);
-
 try {
-  mongoose.connect(config.get("db"));
-  console.log(`MongoDB connected ${config.get("db")}`);
+  if (process.env.NODE_ENV === "test") {
+    const db = config.get("db_test");
+    mongoose.connect(db);
+    console.log(`MongoDB connected ${db}`);
+  } else if (process.env.NODE_ENV === "development") {
+    const db = config.get("db_local");
+    mongoose.connect(db);
+    console.log(`MongoDB connected ${db}`);
+  } else {
+    const db = config.get("db_online");
+    mongoose.connect(db);
+    console.log(`MongoDB connected ${db}`);
+  }
 } catch (error) {
   console.log(error);
 }
