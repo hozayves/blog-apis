@@ -1,8 +1,10 @@
 {
     "jwtPrivateKey": "BLOG_JWTPRIVATEKEY",
-    "mongodb": "MONGODB_CONNECT_STRING",
     "node_env": "NODE_ENV",
     "cloud_name": "CLOUDINARY_NAME",
     "api_key": "CLOUDINARY_KEY",
-    "api_secret": "CLOUDINARY_SECRET"
+    "api_secret": "CLOUDINARY_SECRET",
+    "db_local": "MONGODB_CONNECT_LOCAL",
+    "db_online": "MONGODB_CONNECT_ONLINE",
+    "db_test": "MONGODB_CONNECT_TEST"
 }

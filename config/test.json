@@ -5,5 +5,5 @@
     "cloud_name": "",
     "api_key": "",
     "api_secret": "",
-    "db": "mongodb://localhost:27017/blogAPI_tests"
+    "db": ""
 }
