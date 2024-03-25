@@ -32,7 +32,7 @@ const getBlog = async (req, res) => {
 };
 // Function to get all blog
 const getAllBlog = async (req, res) => {
-  const blogs = await BlogModel.find();
+  const blogs = await BlogModel.find().sort("-_id");
 
   if (!blogs) {
     return res
